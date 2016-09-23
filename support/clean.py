@@ -5,7 +5,7 @@ DEBUG = 0
 class solution():
     def __init__(self):
         if DEBUG == 1:
-            self.fileName =  'test.txt'
+            self.fileName =  'debug\\test.txt'
         else:
             self.fileName =  'content.txt'
         self.key = {'asm', 'do', 'if', 'return',
@@ -52,7 +52,8 @@ class solution():
     def handleHpp(self, oneFile, newFile):
         one = open(oneFile, 'r')
         new = open(newFile, 'w')
-#        test = open("result.txt", "w")
+        if DEBUG == 1:
+            test = open("debug\\result.txt", "w")
         edge = 1
         pre = 0
         cur = 0
@@ -60,23 +61,27 @@ class solution():
         stack = list()
         for line in one.readlines():
             data = line.strip()
-#            print >>  test, data, "edge =", edge, "pre =", pre, "cur =", cur, "len =", len(stack), "tmp =", tmp
+            if DEBUG == 1:
+                print >>  test, data, "edge =", edge, "pre =", pre, "cur =", cur, "len =", len(stack), "tmp =", tmp
             if data[:9] == 'namespace' and cur == 0:
-                edge = 3
-            elif data[:5] == 'class' and cur == 0:
                 edge = 2
+            elif data[:5] == 'class':
+                if edge == 2:
+                    edge = 3
+                else:
+                    edge = 2
             elif data[:6] == 'struct':
 #                print data
                 stack.append(cur)
                 tmp = cur
             if len(stack) > 0:    #for the struct
+                print >> new, data
                 for i in xrange(len(data)):
                     if data[i] == '{':
                         tmp += 1
                     elif data[i] == '}':
                         tmp -= 1
                 if tmp != cur:
-                    print >> new, data
                     continue
                 cur = stack.pop()
                 tmp = cur
@@ -86,8 +91,7 @@ class solution():
                             tmp += 1
                         elif data[i] == '}':
                             tmp -= 1
-                    print >> new, data
-                    continue
+                continue
             for i in xrange(len(data)):
                 if data[i] == '{':
                     cur += 1
@@ -100,7 +104,8 @@ class solution():
                 edge = 1
         one.close()
         new.close()
-#        test.close()
+        if DEBUG == 1:
+            test.close()
         
     def clean(self):
         f = open(self.fileName, 'r')
@@ -121,7 +126,7 @@ class solution():
             elif tmp[-2:] == '.h':
                 oneFile += tmp
                 newFile += tmp
-                self.handleHpp(oneFile, newFile)
+                self.handleH(oneFile, newFile)
         f.close()
 a = solution()
 a.clean()
