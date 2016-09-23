@@ -55,11 +55,13 @@ class solution():
         if DEBUG == 1:
             test = open("debug\\result.txt", "w")
         edge = 1
+        tag = 0
         pre = 0
         cur = 0
         tmp = 0
         stack = list()
         for line in one.readlines():
+            tag = 0
             data = line.strip()
             if DEBUG == 1:
                 print >>  test, data, "edge =", edge, "pre =", pre, "cur =", cur, "len =", len(stack), "tmp =", tmp
@@ -74,6 +76,20 @@ class solution():
 #                print data
                 stack.append(cur)
                 tmp = cur
+            elif data[:1] == '#':
+                for i in xrange(1, len(data)):
+                    if data[i] != ' ':
+                        break
+                if data[i:(i+7)] == 'include':
+                    for i in xrange(i+7, len(data)):
+                        if data[i] == '<':
+                            if data[(i+1):(i+6)] == 'boost':
+                                tag = 1
+                            data = data[:i] + '"' + data[(i+1):]
+                        elif data[i] == '>':
+                            data = data[:i] + '"' + data[(i+1):]
+            if tag == 1:
+                continue
             if len(stack) > 0:    #for the struct
                 print >> new, data
                 for i in xrange(len(data)):
